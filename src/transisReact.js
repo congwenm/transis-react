@@ -96,7 +96,7 @@ const componentWillMount = function({ globalTransisObject, state, props }) {
 } // end of Component Will Mount Factory
 
 // TODO: better way of writing this
-const remapStateToProps = ({ props, state, remap }) => {
+export const remapStateToAvoidProps = ({ props, state, remap }) => {
   let newState = {}
   if (remap) {
     for (let [k, v] of Object.entries(state)) {
@@ -106,14 +106,14 @@ const remapStateToProps = ({ props, state, remap }) => {
   else {
     newState = state
   }
-  
+
   if (props && newState) {
     const statePropsConflicts = findDuplicate([...Object.keys(newState), ...Object.keys(props)])
     if (statePropsConflicts.length) {
       throw new Error(`state variable names conflicted with props, please remap the following: "${statePropsConflicts.join(', ')}"`)
     }
   }
-  
+
   return newState
 }
 
@@ -121,7 +121,7 @@ const ObjectValues = obj =>
   Object.entries(obj).reduce((acc, next) => [...acc, next[1]], [])
 
 const findDuplicate = list => {
-  const set = list.reduce((set, item) => { 
+  const set = list.reduce((set, item) => {
     set[item] = set[item] || 0
     set[item]++
     return set
@@ -223,7 +223,7 @@ const transisReact = (
     };
 
     render = () => {
-      const stateParams = remapStateToProps({ props: this.props, state: this.state, remap })
+      const stateParams = remapStateToAvoidProps({ props: this.props, state: this.state, remap })
 
       return <ComposedComponent
         ref={core => this.core = core}

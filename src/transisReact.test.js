@@ -1,10 +1,37 @@
-import transisReact from './transisReact' // sometimes two instance of transis occurs
+import transisReact, {remapStateToAvoidProps} from './transisReact' // sometimes two instance of transis occurs
 
 import {
   Model, CoreComponent, TransisObjectFactory,
   // expectations
   initial_state_expectation, state_change_sequence_expectation,
 } from './test_helper/testUtil'
+
+
+describe('#remapStateToAvoidProps', () => {
+  it('works if there are no conflict', () => {
+    expect(remapStateToAvoidProps({
+      props: {},
+      state: { a: 1 }
+    })).toEqual({ a: 1 })
+  })
+
+  it("raise exception", () => {
+    expect(
+      () => remapStateToAvoidProps({
+        props: { a: 1 },
+        state: { a: 2 }
+      })
+    ).toThrow(new Error(`state variable names conflicted with props, please remap the following: "a"`))
+  })
+
+  it('remaps state name by specifying', () => {
+    expect(remapStateToAvoidProps({
+      props: { a: 1},
+      state: { a: 2 },
+      remap: { a: 'b' }
+    })).toEqual({ b: 2 })
+  })
+})
 
 // TODOS:
 // state and prop mixin conflict
@@ -125,19 +152,19 @@ describe('variable name conflicts and the {remap} option', () => {
     }, ({ child }) => <div className="name">{child.name}</div>)
 
     it('conflicts between states and props', () => {
-      expect(() => mount( 
+      expect(() => mount(
         <ConflictStatePropsComponent child={{ name: 'Jeter' }} />
       )).toThrowError('state variable names conflicted with props, please remap the following: "child"')
     })
 
     it('conflicts between states and props', () => {
-      expect(() => mount( 
+      expect(() => mount(
         <ConflictRemapPropsComponent kid={{ name: 'Jeter' }} />
       )).toThrowError('state variable names conflicted with props, please remap the following: "kid"')
     })
 
     it('conflict saved by remap', () => {
-      expect(() => 
+      expect(() =>
         mount( <ConflictRemapPropsComponent child={{ name: 'Jeter' }} />)
       ).not.toThrowError()
     })
