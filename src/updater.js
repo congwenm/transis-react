@@ -22,6 +22,7 @@ const logUpdate = component => updateLog.add(component);
 let updateQueue = {};
 
 const queueUpdate = component => {
+  console.info('update queued', component)
   updateQueue[component._transisId] = component;
 };
 

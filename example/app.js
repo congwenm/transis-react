@@ -60,7 +60,7 @@ const _AuthorAge = transisAware(
 
 const App = transisAware(
   {
-    global: globalObj,
+    transisObject: globalObj,
     state: {
       book: ['name', 'author.name', 'pages']
     },
@@ -81,7 +81,7 @@ const App = transisAware(
 
 // smart mixin
 const Clock = transisAware(
-  { global: globalObj, state: ['time'] },
+  { transisObject: globalObj, state: ['time'] },
   ({ time }) => <span> {time && time.toLocaleTimeString()} </span>
 )
 
@@ -105,23 +105,33 @@ ReactDOM.render(
 
     <fieldset>
       <legend><h3>Controls</h3></legend>
-      <button onClick={() => globalObj.book.name = fakeString(10)}>
+      <button onClick={() => {
+        console.info('updating');
+        globalObj.book.name = fakeString(10);
+      }}>
         Change book title
         <div>state - attr</div>
       </button>
 
-      <button onClick={() => globalObj.book.pages = Math.floor(Math.random()*500)}>
+      <button onClick={() => {
+        console.info('updating');
+        globalObj.book.pages = Math.floor(Math.random()*500);
+      }}>
         Change book pages
         <div>state - prop</div>
       </button>
 
-      <button onClick={() => globalObj.book.author.name = fakeString(10)}>
+      <button onClick={() => {
+        console.info('updating')
+        globalObj.book.author.name = fakeString(10);
+      }}>
         Change author name
         <div>state - association - primitive</div>
       </button>
-      <button onClick={() =>
-        globalObj.book.author.age = Math.floor(Math.random() * 100)
-      }>
+      <button onClick={() => {
+        console.info('updating')
+        globalObj.book.author.age = Math.floor(Math.random() * 100);
+      }}>
         Change author age
         <div>props - attr</div>
       </button>
