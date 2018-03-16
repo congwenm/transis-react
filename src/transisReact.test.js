@@ -21,14 +21,14 @@ describe('#remapStateToAvoidProps', () => {
         props: { a: 1 },
         state: { a: 2 }
       })
-    ).toThrow(new Error(`state variable names conflicted with props, please remap the following: "a"`))
+    ).toThrow(new Error(`state variable names conflicted with props, please rename the following: "a"`))
   })
 
   it('remaps state name by specifying', () => {
     expect(remapStateToAvoidProps({
       props: { a: 1},
       state: { a: 2 },
-      remap: { a: 'b' }
+      stateToPropMap: { a: 'b' }
     })).toEqual({ b: 2 })
   })
 })
@@ -61,7 +61,7 @@ describe('PropMixin', function() {
 describe('StateMixin', () => {
   const appState = new (TransisObjectFactory('model'))({ model }) // gloal state
   const StateMixinComponent = transisReact({ // with state mixin
-    global: appState,
+    transisObject: appState,
     state: { model: ['baz'] }
   }, CoreComponent)
 
@@ -82,7 +82,7 @@ describe('StateMixin', () => {
 
   describe('smart stateMixin parameters', () => {
     const SmartMixinComponent = transisReact({
-      global: appState.model,
+      transisObject: appState.model,
       state: ['foo', 'bar', 'baz']
     }, props => <CoreComponent model={props}/>)
 
@@ -101,9 +101,9 @@ describe('variable name conflicts and the {remap} option', () => {
     })
 
     const RemapComponent = transisReact({
-      global: appState,
+      transisObject: appState,
       state: { mobel: ['foo'], name: [] },
-      remap: { mobel: 'model' },
+      stateToPropMap: { mobel: 'model' },
     }, class _ extends React.Component {  // you can only use ref on <React.Component>
       render = () => <div>
         <CoreComponent model={this.props.model} />
@@ -128,11 +128,11 @@ describe('variable name conflicts and the {remap} option', () => {
       it('throws an error', () => {
         expect(() =>
           transisReact({
-            global: appState,
+            transisObject: appState,
             state: { mobel: ['foo'], name: [] },
-            remap: { mobel: 'name' },
+            stateToPropMap: { mobel: 'name' },
           }, () => <div>Conflict!</div>)
-        ).toThrowError('Cannot remap conflicting names "name"')
+        ).toThrowError('Cannot rename props due to conflicting names "name"')
       })
     })
   })
@@ -141,26 +141,26 @@ describe('variable name conflicts and the {remap} option', () => {
     const child = new (TransisObjectFactory('name'))({ name: 'John' })
     const appState = new (TransisObjectFactory('name', 'child'))({ child }) //state
     const ConflictStatePropsComponent = transisReact({
-      global: appState,
+      transisObject: appState,
       state: ['child']
     }, ({ child }) => <div className="name">{child.name}</div>)
 
     const ConflictRemapPropsComponent = transisReact({
-      global: appState,
+      transisObject: appState,
       state: ['child'],
-      remap: { child: 'kid' }
+      stateToPropMap: { child: 'kid' }
     }, ({ child }) => <div className="name">{child.name}</div>)
 
     it('conflicts between states and props', () => {
       expect(() => mount(
         <ConflictStatePropsComponent child={{ name: 'Jeter' }} />
-      )).toThrowError('state variable names conflicted with props, please remap the following: "child"')
+      )).toThrowError('state variable names conflicted with props, please rename the following: "child"')
     })
 
     it('conflicts between states and props', () => {
       expect(() => mount(
         <ConflictRemapPropsComponent kid={{ name: 'Jeter' }} />
-      )).toThrowError('state variable names conflicted with props, please remap the following: "kid"')
+      )).toThrowError('state variable names conflicted with props, please rename the following: "kid"')
     })
 
     it('conflict saved by remap', () => {
@@ -191,7 +191,7 @@ describe('combining state and props tests', () => {
   const appState = new (TransisObjectFactory('injected'))({ injected: inject1 })
   const AwareComponent = transisReact({
     props: { model: ['foo', 'bar']},
-    global: appState,
+    transisObject: appState,
     state: { injected: ['name'] }
   }, AwareComponentCore)
   // end of lifcycle test component setup
@@ -347,7 +347,7 @@ describe('combining state and props tests', () => {
     })
 
     const NoReRenderComponent = transisReact({
-      global: appState,
+      transisObject: appState,
       state: { injected: ['name'] }
     }, class NoReRenderComponentCore extends React.Component {
       render() {

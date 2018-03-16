@@ -3,8 +3,7 @@ import {
   componentComparison,
   queueUpdate, updateQueue,
   logUpdate, updateLog,
-} from './helper'
-
+} from './updater'
 
 
 describe('#assignTransisIdTo', () => {
@@ -22,7 +21,7 @@ describe('#assignTransisIdTo', () => {
 
 const item1 = { _transisId: 255 }
 describe('updateQueue<Hash> and #queueUpdate', () => {
-  test('#queueUpdate adds `[transisId]: item` onto updateQueue{}', () => {
+  it('#queueUpdate adds `[transisId]: item` onto updateQueue{}', () => {
     expect(updateQueue).toEqual({})
     queueUpdate(item1)
     expect(updateQueue).toEqual({ 255: item1 })
@@ -31,9 +30,9 @@ describe('updateQueue<Hash> and #queueUpdate', () => {
 
 describe('logUpdate<Hash> and #updateLog', () => {
   test('#logUpdate adds `[transisId]: item` onto updateLog{}', () => {
-    expect(updateLog).toEqual({})
+    expect(updateLog.size).toEqual(0)
     logUpdate(item1)
-    expect(updateLog).toEqual({ 255: true })
+    expect(updateLog).toEqual(new Set([item1]))
   })
 })
 
